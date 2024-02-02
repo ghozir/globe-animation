@@ -7,13 +7,15 @@ import time
 
 start_time = time.time()
 new_time = time.time()
+new_day = time.time()
 year = 0
 day = 0
 sun_texture = 0
 bumi_texture = 0
 background_texture = 0
 resetDay = 0
-moonKet = "Bulan Sabit"
+day_year = 0
+moonKet = "Bulan Baru"
 
 def read_textures():
     global sun_texture, bumi_texture, background_texture
@@ -70,19 +72,21 @@ def draw_custom_text(x, y, text):
     glMatrixMode(GL_MODELVIEW)    
 
 def display():
-    global year, day, sun_texture, bumi_texture, background_texture, resetDay, moonKet, new_time# Add these global declarations
+    global year, day, sun_texture, bumi_texture, background_texture, resetDay, moonKet, new_time, new_day, day_year# Add these global declarations
 
     t = time.time() - start_time
     resetDay = time.time() - new_time
-    year_period = 10000.0  # 5 seconds for simulating one year
+    day_year = time.time() - new_day
+    year_period = 120.0  # 5 seconds for simulating one year
     year = (t / year_period)
     resetDay = int(365 * (resetDay / year_period))
+    day_year = str(int(365 * (day_year / year_period)))
     day = 365 * year
     moon_sid = (365 / 27.3) * year
     dayLis = int(day)
     dayList = str(dayLis)
     
-    if(resetDay >= 0 and resetDay <= 4):
+    if(resetDay >= 1 and resetDay <= 4):
         moonKet = "Bulan Sabit"
     elif(resetDay >= 5 and resetDay <= 8):
         moonKet = "Bulan Paruh"
@@ -96,20 +100,19 @@ def display():
         moonKet = "Bulan Paruh"
     elif(resetDay >= 22 and resetDay <= 25):
         moonKet = "Bulan Sabit"
-    elif(resetDay >= 26 and resetDay <= 30):
+    elif((resetDay >= 26 and resetDay <= 30) or resetDay == 0):
         moonKet = "Bulan Baru"
 
     if(resetDay == 30):
         new_time = time.time()
 
+    if(day_year == "365"):
+        new_day = time.time()
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     # Set light position
 
-    glLoadIdentity()
-
-    # Set camera position
-    gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
     # Draw background
     glBindTexture(GL_TEXTURE_2D, background_texture)
@@ -129,7 +132,7 @@ def display():
     # glColor3f(1.0, 1.0, 1.0)  # Set text color to whit
     # Render additional text
     draw_custom_text(50, 750, "Rotasi Bulan Memutari Bumi dan Bumi Memutari")  # Adjust the position as needed
-    draw_custom_text(50, 700, "Hari Ke : "+dayList)  # Adjust the position as needed
+    draw_custom_text(50, 700, "Hari Ke : "+day_year)  # Adjust the position as needed
     draw_custom_text(50, 650, "Fase Bulan : "+moonKet)  # Adjust the position as needed
 
     glDisable(GL_LIGHTING)
@@ -207,9 +210,9 @@ def reshape(w, h):
 
 glutInit()
 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
-glutInitWindowSize(800, 800)
+glutInitWindowSize(1200, 800)
 glutInitWindowPosition(100, 100)
-glutCreateWindow(b"Transformation")
+glutCreateWindow(b"Sistem Solar Bumi Bulan Matahari")
 
 init()
 read_textures()
